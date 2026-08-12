@@ -56,7 +56,10 @@ Aqui estão os prints mostrando os testes realizados, onde o modelo tenta identi
 [`Teste 1; "Com o celular"`](./teste-com.png)
 [`Teste 2: "Sem o celular"`](./teste-sem.png)
 
-Painel de Treino: **[`paineldetreino.png`](./paineldetreino.png)**
+
+Painel de Treino: 
+
+[`paineldetreino.png`](./paineldetreino.png)
 
 ### Vídeo
 O vídeo mostra o funcionamento do modelo e alguns testes feitos utilizando a webcam.
