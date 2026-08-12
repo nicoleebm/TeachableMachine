@@ -64,7 +64,7 @@ Print do Painel de Treino:
 ### Vídeo
 O vídeo mostra o funcionamento do modelo e alguns testes feitos utilizando a webcam.
 
-****
+**[`Reconhecimento com Íris`](./reconhecimentoimagem.mp4)**
 
 ## Reflexão
 Durante os testes, o modelo apresentou alguns erros na hora de identificar as imagens. Acredito que isso aconteceu por causa do excesso de informações nas imagens, dos diferentes ângulos e posições, além da iluminação e da qualidade da imagem. Esses fatores acabaram dificultando um pouco a identificação correta pela IA. Acho que, com mais dados e imagens em situações diferentes, o modelo poderia ter resultados melhores e mais precisos.
