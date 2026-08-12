@@ -53,8 +53,8 @@ Aqui está um print mostrando o painel do Teachable Machine durante o treinament
 
 Aqui estão os prints mostrando os testes realizados, onde o modelo tenta identificar se a pessoa está com ou sem celular:
 
-Teste com o resultado da "Sem o celular": [`/teste1.png`](.teste-com.png)
-Teste com o resultado da "Sem o celular": [`/teste2.png`](.teste-sem.png)
+Teste com o resultado da "Sem o celular": [`/teste-com.png`](.teste-com.png)
+Teste com o resultado da "Sem o celular": [`/teste-sem.png`](.teste-sem.png)
 
 ****
 
