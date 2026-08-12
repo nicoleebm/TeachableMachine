@@ -39,7 +39,7 @@ O modelo treinado no Teachable Machine pode ser acessado pelo link abaixo:
 
 O código da aplicação está disponível no meu repositório do GitHub:
 
-**[COLE AQUI O LINK DO SEU GITHUB]**
+**https://github.com/nicoleebm/TeachableMachine/blob/main/site.html**
 
 ## Prints / Evidências
 
