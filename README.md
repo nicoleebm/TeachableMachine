@@ -57,9 +57,9 @@ Aqui estão os prints mostrando os testes realizados, onde o modelo tenta identi
 [`Teste 2: "Sem o celular"`](./teste-sem.png)
 
 
-Painel de Treino: 
+Print do Painel de Treino: 
 
-[`Print do Teachable Machine`](./paineldetreino.png)
+[`Teachable Machine`](./paineldetreino.png)
 
 ### Vídeo
 O vídeo mostra o funcionamento do modelo e alguns testes feitos utilizando a webcam.
