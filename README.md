@@ -28,21 +28,12 @@ Os dados foram **gravados por mim utilizando a minha própria webcam**.
 
 Não utilizei nenhum dataset externo, como os encontrados no Kaggle. Eu mesmo gravei as imagens utilizadas para treinar as duas classes do modelo.
 
-## Tecnologias utilizadas
-
-* Teachable Machine
-* Inteligência Artificial
-* Classificação de imagens
-* Webcam
-* HTML
-* CSS
-* JavaScript
 
 ## Link do modelo exportado
 
 O modelo treinado no Teachable Machine pode ser acessado pelo link abaixo:
 
-**[COLE AQUI O LINK DO SEU MODELO]**
+**[https://teachablemachine.withgoogle.com/models/KDzA0pL4bu/]**
 
 ## Código-fonte
 
