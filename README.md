@@ -56,7 +56,7 @@ Aqui está os prints mostrando os testes realizados, onde o modelo tenta identif
 Teste com o celular: teste-com.png
 Teste sem o celular: Tteste-sem.png
 
-[`/teste.png`](.teste-sem.png)
+[`teste.png`](.teste-sem.png)
 
 ****
 
