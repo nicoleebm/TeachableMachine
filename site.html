@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Íris · Reconhecimento por Imagem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ===== Paleta — tons de roxo, feminina e harmônica ===== */
+    --bg-1: #f7f1fb;         /* lilás quase branco */
+    --bg-2: #efe0f7;         /* lavanda suave */
+    --bg-3: #f6e3ee;         /* blush lilás */
+    --surface: #ffffff;
+    --surface-tint: #fbf6fd;
+    --deep-plum: #3a1f4d;    /* texto principal / títulos */
+    --royal-purple: #6c3aae; /* ação primária */
+    --royal-purple-dark: #5a2f92;
+    --orchid: #b87fd9;       /* acento secundário */
+    --blush-mauve: #e7b8de;  /* toque feminino, bordas, detalhes */
+    --muted-purple: #8e75a6; /* texto secundário */
+    --line: #e6d6f0;
+    --error-bg: #fbe6ef;
+    --error-border: #e3a9c4;
+    --error-text: #7a2e4d;
+
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: 'Manrope', sans-serif;
+    color: var(--deep-plum);
+    background:
+      radial-gradient(60% 50% at 12% 8%, var(--bg-3) 0%, transparent 60%),
+      radial-gradient(55% 45% at 90% 12%, var(--bg-2) 0%, transparent 60%),
+      radial-gradient(70% 60% at 50% 100%, var(--bg-2) 0%, transparent 55%),
+      var(--bg-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6% 4%;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* pétalas decorativas de fundo */
+  .petal {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .petal--1 {
+    width: 34%; aspect-ratio: 1;
+    top: -8%; left: -6%;
+    background: radial-gradient(circle at 30% 30%, var(--blush-mauve), transparent 70%);
+  }
+  .petal--2 {
+    width: 28%; aspect-ratio: 1;
+    bottom: -10%; right: -8%;
+    background: radial-gradient(circle at 70% 70%, var(--orchid), transparent 70%);
+    opacity: 0.4;
+  }
+  .petal--3 {
+    width: 18%; aspect-ratio: 1;
+    top: 55%; left: -6%;
+    background: radial-gradient(circle, var(--bg-2), transparent 70%);
+    opacity: 0.5;
+  }
+
+  /* ===== Layout fluido — tudo em % / clamp, nunca px fixos de largura ===== */
+  .page {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .app {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 9% 8%;
+    box-shadow:
+      0 1.5% 3% rgba(108, 58, 174, 0.10),
+      0 0.3% 0.6% rgba(108, 58, 174, 0.08);
+    text-align: center;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: clamp(0.68rem, 2vw, 0.75rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--royal-purple);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 5%;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--orchid);
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    line-height: 1.15;
+    margin: 0 0 2.5%;
+    color: var(--deep-plum);
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--royal-purple);
+  }
+
+  p.subtitle {
+    color: var(--muted-purple);
+    font-size: clamp(0.85rem, 2.2vw, 0.98rem);
+    line-height: 1.55;
+    margin: 0 0 8%;
+    width: 100%;
+  }
+
+  /* ===== Botão ===== */
+  #start-btn {
+    width: 100%;
+    max-width: 78%;
+    background: linear-gradient(135deg, var(--royal-purple), var(--orchid));
+    color: #fff;
+    border: none;
+    padding: 4.2% 6%;
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(0.9rem, 2.4vw, 1rem);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    box-shadow: 0 8px 22px rgba(108, 58, 174, 0.32);
+  }
+
+  #start-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 10px 26px rgba(108, 58, 174, 0.4);
+  }
+
+  #start-btn:active { transform: translateY(0); }
+
+  #start-btn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+    transform: none;
+  }
+
+  /* ===== Área da webcam — moldura "aperture" floral ===== */
+  #webcam-stage {
+    width: 62%;
+    max-width: 260px;
+    aspect-ratio: 1;
+    margin: 9% auto 3%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #webcam-stage::before {
+    content: "";
+    position: absolute;
+    inset: -6%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--royal-purple), var(--blush-mauve), var(--orchid), var(--royal-purple));
+    opacity: 0.55;
+    animation: spin 10s linear infinite;
+  }
+
+  #webcam-stage.is-active::before {
+    animation: spin 4s linear infinite;
+    opacity: 0.85;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  #webcam-container {
+    position: relative;
+    width: 92%;
+    height: 92%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--surface-tint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--surface);
+    box-shadow: 0 6px 20px rgba(58, 31, 77, 0.18);
+  }
+
+  #webcam-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+
+  #webcam-placeholder {
+    font-size: 2rem;
+    color: var(--blush-mauve);
+  }
+
+  /* ===== Resultados ===== */
+  #label-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3%;
+    margin-top: 6%;
+    width: 100%;
+    text-align: left;
+  }
+
+  .prediction {
+    width: 100%;
+    background: var(--surface-tint);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 3.2% 4.5%;
+  }
+
+  .prediction-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: clamp(0.82rem, 2.1vw, 0.92rem);
+  }
+
+  .prediction-name {
+    font-weight: 700;
+    color: var(--deep-plum);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .prediction-name::before {
+    content: "✦";
+    color: var(--orchid);
+    font-size: 0.75em;
+  }
+
+  .prediction-value {
+    color: var(--royal-purple);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .prediction-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+
+  .prediction-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--royal-purple), var(--orchid), var(--blush-mauve));
+    transition: width 0.25s ease;
+  }
+
+  /* ===== Erro ===== */
+  #error-box {
+    display: none;
+    margin-top: 6%;
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+    border-radius: var(--radius-sm);
+    padding: 4% 5%;
+    font-size: clamp(0.78rem, 2vw, 0.86rem);
+    text-align: left;
+    line-height: 1.6;
+    width: 100%;
+  }
+
+  #error-box code {
+    background: rgba(122, 46, 77, 0.08);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.92em;
+  }
+
+  footer {
+    margin-top: 8%;
+    font-size: clamp(0.68rem, 1.8vw, 0.76rem);
+    color: var(--muted-purple);
+    letter-spacing: 0.02em;
+  }
+
+  footer a {
+    color: var(--royal-purple);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* ===== Responsivo — ajustes finos para telas pequenas ===== */
+  @media (max-width: 480px) {
+    .page { max-width: 100%; }
+    .app { width: 100%; padding: 8% 6%; border-radius: 22px; }
+    #start-btn { max-width: 100%; padding: 4.5% 6%; }
+    #webcam-stage { width: 72%; }
+  }
+
+  @media (min-width: 900px) {
+    .page { max-width: 40%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #webcam-stage::before,
+    #start-btn,
+    .prediction-bar-fill {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="petal petal--1"></div>
+  <div class="petal petal--2"></div>
+  <div class="petal petal--3"></div>
+
+  <div class="page">
+    <div class="app">
+      <span class="eyebrow">Visão em tempo real</span>
+      <h1>Reconhecimento com <em>Íris</em></h1>
+      <p class="subtitle">Aponte a câmera e deixe o modelo identificar o que está vendo, em tempo real, direto no navegador.</p>
+
+      <button id="start-btn" type="button" onclick="init()">Iniciar câmera</button>
+
+      <div id="webcam-stage">
+        <div id="webcam-container">
+          <span id="webcam-placeholder">◐</span>
+        </div>
+      </div>
+
+      <div id="label-container"></div>
+      <div id="error-box"></div>
+
+      <footer>Modelo treinado no Google Teachable Machine</footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script type="text/javascript">
+    // Link do modelo exportado pelo Teachable Machine
+    const URL = "https://teachablemachine.withgoogle.com/models/KDzA0pL4bu/";
+    let model, webcam, labelContainer, maxPredictions;
+
+    async function init() {
+      const startBtn = document.getElementById("start-btn");
+      const webcamStage = document.getElementById("webcam-stage");
+      const webcamContainer = document.getElementById("webcam-container");
+      const errorBox = document.getElementById("error-box");
+
+      errorBox.style.display = "none";
+      errorBox.innerHTML = "";
+      startBtn.disabled = true;
+      startBtn.textContent = "Carregando...";
+      webcamContainer.innerHTML = '<span id="webcam-placeholder">◐</span>';
+
+      if (!window.isSecureContext) {
+        showError(
+          "A câmera só funciona em <strong>HTTPS</strong> ou <strong>localhost</strong>. Abrir o arquivo direto (file://) bloqueia o acesso à webcam. Rode um servidor local (ex: <code>python3 -m http.server</code>) ou publique o arquivo em um serviço com HTTPS."
+        );
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showError("Seu navegador não suporta acesso à câmera (getUserMedia indisponível).");
+        return;
+      }
+
+      // Etapa 1: carregar o modelo (aqui costuma ocorrer o "Failed to fetch")
+      try {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+      } catch (err) {
+        console.error(err);
+        let msg;
+        if (window.location.protocol === "file:") {
+          msg =
+            "Falha ao buscar o modelo (Failed to fetch). Você abriu este arquivo direto no navegador (file://), " +
+            "e isso bloqueia o carregamento do modelo do Teachable Machine. " +
+            "Solução: rode um servidor local, por exemplo <code>python3 -m http.server</code> na pasta do arquivo " +
+            "e acesse via http://localhost:8000, ou publique o arquivo em um serviço como Netlify Drop / GitHub Pages.";
+        } else {
+          msg =
+            "Falha ao buscar o modelo (Failed to fetch). Isso costuma significar que o link do modelo expirou " +
+            "ou foi removido no Teachable Machine, ou que não há conexão com a internet no momento. " +
+            "Tente abrir este link direto no navegador para confirmar: <br><code>" + URL + "model.json</code>" +
+            "<br>Se der erro 404, será preciso gerar um novo link exportando o modelo novamente.";
+        }
+        showError(msg);
+        return;
+      }
+
+      // Etapa 2: iniciar a webcam
+      try {
+        const flip = true;
+        webcam = new tmImage.Webcam(260, 260, flip);
+        await webcam.setup();
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        webcamContainer.innerHTML = "";
+        webcamContainer.appendChild(webcam.canvas);
+        webcamStage.classList.add("is-active");
+
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = "";
+        for (let i = 0; i < maxPredictions; i++) {
+          const item = document.createElement("div");
+          item.className = "prediction";
+          item.innerHTML =
+            '<div class="prediction-top">' +
+              '<span class="prediction-name">—</span>' +
+              '<span class="prediction-value">0%</span>' +
+            '</div>' +
+            '<div class="prediction-bar"><div class="prediction-bar-fill"></div></div>';
+          labelContainer.appendChild(item);
+        }
+
+        startBtn.textContent = "Câmera ativa";
+      } catch (err) {
+        console.error(err);
+        let msg = "Erro ao acessar a câmera: " + err.message;
+        if (err.name === "NotAllowedError") {
+          msg = "Permissão de câmera negada. Autorize o acesso à câmera nas configurações do navegador e tente novamente.";
+        } else if (err.name === "NotFoundError") {
+          msg = "Nenhuma câmera foi encontrada neste dispositivo.";
+        }
+        showError(msg);
+      }
+    }
+
+    function showError(message) {
+      const startBtn = document.getElementById("start-btn");
+      const errorBox = document.getElementById("error-box");
+      startBtn.disabled = false;
+      startBtn.textContent = "Tentar novamente";
+      errorBox.innerHTML = message;
+      errorBox.style.display = "block";
+    }
+
+    async function loop() {
+      webcam.update();
+      await predict();
+      window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+      const prediction = await model.predict(webcam.canvas);
+      // ordena da maior para a menor probabilidade, mantendo os mesmos slots
+      for (let i = 0; i < maxPredictions; i++) {
+        const item = labelContainer.children[i];
+        const probability = prediction[i].probability;
+        const percent = Math.round(probability * 100);
+
+        item.querySelector(".prediction-name").textContent = prediction[i].className;
+        item.querySelector(".prediction-value").textContent = percent + "%";
+        item.querySelector(".prediction-bar-fill").style.width = percent + "%";
+      }
+    }
+  </script>
+
+</body>
+</html>
